@@ -6,8 +6,8 @@
 #
 ##############################################################################
 
-from odoo import api, fields, models
-from odoo import tools
+from openerp import api, fields, models
+from openerp import tools
 
 STATE_COLOR_SELECTION = [
     ('0', 'Red'),
@@ -65,9 +65,9 @@ class asset_asset(models.Model):
     _description = 'Asset'
     _inherit = ['mail.thread']
 
-    def _read_group_state_ids(self, domain, read_group_order=None, access_rights_uid=None, team='3'):
-        access_rights_uid = access_rights_uid or self.uid
-        stage_obj = self.env['asset.state']
+    def _read_group_state_ids(self, cr, uid, ids, domain, read_group_order=None, access_rights_uid=None, context=None, team='3'):
+        access_rights_uid = access_rights_uid or uid
+        stage_obj = self.pool.get('asset.state')
         order = stage_obj._order
         # lame hack to allow reverting search, should just work in the trivial case
         if read_group_order == 'stage_id desc':
@@ -78,23 +78,23 @@ class asset_asset(models.Model):
         search_domain = []
         search_domain += ['|', ('team','=',team)]
         search_domain += [('id', 'in', ids)]
-        stage_ids = stage_obj._search(search_domain, order=order, access_rights_uid=access_rights_uid)
-        result = stage_obj.name_get(access_rights_uid, stage_ids)
+        stage_ids = stage_obj._search(cr, uid, search_domain, order=order, access_rights_uid=access_rights_uid, context=context)
+        result = stage_obj.name_get(cr, access_rights_uid, stage_ids, context=context)
         # restore order of the search
         result.sort(lambda x,y: cmp(stage_ids.index(x[0]), stage_ids.index(y[0])))
-        return result, {}    
+        return result, {}
 
-    def _read_group_finance_state_ids(self, domain, read_group_order=None, access_rights_uid=None):
-        return self._read_group_state_ids(domain, read_group_order, access_rights_uid, '0')
+    def _read_group_finance_state_ids(self, cr, uid, ids, domain, read_group_order=None, access_rights_uid=None, context=None):
+        return self._read_group_state_ids(cr, uid, ids, domain, read_group_order, access_rights_uid, context, '0')
 
-    def _read_group_warehouse_state_ids(self, domain, read_group_order=None, access_rights_uid=None):
-        return self._read_group_state_ids(domain, read_group_order, access_rights_uid, '1')
+    def _read_group_warehouse_state_ids(self, cr, uid, ids, domain, read_group_order=None, access_rights_uid=None, context=None):
+        return self._read_group_state_ids(cr, uid, ids, domain, read_group_order, access_rights_uid, context, '1')
 
-    def _read_group_manufacture_state_ids(self, domain, read_group_order=None, access_rights_uid=None):
-        return self._read_group_state_ids(domain, read_group_order, access_rights_uid, '2')
+    def _read_group_manufacture_state_ids(self, cr, uid, ids, domain, read_group_order=None, access_rights_uid=None, context=None):
+        return self._read_group_state_ids(cr, uid, ids, domain, read_group_order, access_rights_uid, context, '2')
 
-    def _read_group_maintenance_state_ids(self, domain, read_group_order=None, access_rights_uid=None):
-        return self._read_group_state_ids(domain, read_group_order, access_rights_uid, '3')
+    def _read_group_maintenance_state_ids(self, cr, uid, ids, domain, read_group_order=None, access_rights_uid=None, context=None):
+        return self._read_group_state_ids(cr, uid, ids, domain, read_group_order, access_rights_uid, context, '3')
 
     CRITICALITY_SELECTION = [
         ('0', 'General'),
