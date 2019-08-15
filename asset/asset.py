@@ -54,7 +54,7 @@ class asset_category(models.Model):
     _name = 'asset.category'
 
     name = fields.Char('Tag', required=True, translate=True)
-    asset_ids = fields.Many2many('asset.asset', id1='category_id', id2='asset_id', string='Assets')
+    asset_ids = fields.Many2many('asset.asset', column1='category_id', column2='asset_id', string='Assets')
 
 
 class asset_asset(models.Model):
@@ -128,7 +128,7 @@ class asset_asset(models.Model):
     image = fields.Binary("Image")
     image_small = fields.Binary("Small-sized image")
     image_medium = fields.Binary("Medium-sized image")
-    category_ids = fields.Many2many('asset.category', id1='asset_id', id2='category_id', string='Tags')
+    category_ids = fields.Many2many('asset.category', column1='asset_id', column2='category_id', string='Tags')
 
     _group_by_full = {
         'finance_state_id': _read_group_finance_state_ids,
@@ -146,3 +146,5 @@ class asset_asset(models.Model):
     def write(self, vals):
         tools.image_resize_images(vals)
         return super(asset_asset, self).write(vals)
+
+# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
